@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrooveStorm 2026 – Dance Beyond Limits | VIIT Natraj Club</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-purple: #9D00FF;
+            --primary-blue: #00D4FF;
+            --primary-pink: #FF00E6;
+            --dark-bg: #0a0a0f;
+            --dark-card: #12121a;
+            --neon-glow: 0 0 10px var(--primary-purple), 0 0 20px var(--primary-purple), 0 0 30px var(--primary-blue);
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .hidden { display: none !important; }
+        
+        /* Background Animation */
+        .background-animation {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+        }
+        .light-streak {
+            position: absolute; width: 200%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-purple), var(--primary-blue), var(--primary-pink), transparent);
+            animation: streak 3s infinite; opacity: 0.3;
+        }
+        .streak-1 { top: 20%; animation-delay: 0s; }
+        .streak-2 { top: 50%; animation-delay: 1s; }
+        .streak-3 { top: 80%; animation-delay: 2s; }
+        @keyframes streak {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Popup */
+        .popup-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 10, 15, 0.98); display: flex;
+            justify-content: center; align-items: center; z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+        .popup-content { text-align: center; animation: popIn 0.6s ease; }
+        .event-title-popup {
+            font-size: 4rem; font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-purple), var(--primary-blue), var(--primary-pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: var(--neon-glow); margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite;
+        }
+        .event-subtitle-popup { font-size: 2rem; color: #fff; margin-bottom: 40px; letter-spacing: 3px; }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 20px var(--primary-purple), 0 0 30px var(--primary-blue); }
+            50% { text-shadow: 0 0 30px var(--primary-pink), 0 0 40px var(--primary-purple); }
+        }
+        .enter-btn {
+            padding: 15px 40px; font-size: 1.3rem;
+            background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink));
+            color: #fff; border: none; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 0 20px var(--primary-purple);
+        }
+        .enter-btn:hover { transform: scale(1.1); box-shadow: 0 0 40px var(--primary-pink); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        /* Header */
+        .header { text-align: center; padding: 40px 20px 20px; position: relative; }
+        .event-name {
+            font-size: 3rem;
+            background: linear-gradient(45deg, var(--primary-purple), var(--primary-blue));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: var(--neon-glow); margin-bottom: 10px;
+        }
+        .event-tagline { font-size: 1.3rem; color: var(--primary-pink); letter-spacing: 2px; }
+        .organizer-icon {
+            position: absolute; top: 20px; right: 20px; font-size: 2.5rem;
+            cursor: pointer; color: var(--primary-blue); transition: all 0.3s ease;
+        }
+        .organizer-icon:hover { color: var(--primary-pink); transform: scale(1.1); text-shadow: 0 0 20px var(--primary-pink); }
+        
+        /* Countdown */
+        .countdown-section { text-align: center; padding: 30px 20px; }
+        .countdown-timer { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+        .countdown-item {
+            background: var(--dark-card); padding: 20px; border-radius: 15px;
+            min-width: 100px; box-shadow: 0 0 20px rgba(157, 0, 255, 0.3);
+            border: 2px solid var(--primary-purple);
+        }
+        .countdown-item span { font-size: 2.5rem; font-weight: bold; color: var(--primary-blue); }
+        .countdown-item p { color: var(--primary-pink); margin-top: 5px; }
+        
+        /* Event Details */
+        .event-details { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .section-title { font-size: 2rem; text-align: center; margin-bottom: 30px; color: var(--primary-blue); text-shadow: 0 0 10px var(--primary-blue); }
+        .about-text { text-align: center; font-size: 1.1rem; line-height: 1.8; margin-bottom: 40px; color: #ddd; }
+        .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .detail-card {
+            background: var(--dark-card); padding: 30px; border-radius: 15px; text-align: center;
+            transition: all 0.3s ease; border: 2px solid var(--primary-purple);
+        }
+        .detail-card:hover { transform: translateY(-10px); box-shadow: 0 10px 30px rgba(157, 0, 255, 0.4); border-color: var(--primary-pink); }
+        .detail-card i { font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 15px; }
+        .detail-card h3 { color: var(--primary-purple); margin-bottom: 10px; }
+        .detail-card p { color: #ccc; }
+        
+        /* Prize */
+        .prize-section { text-align: center; margin: 40px 0; }
+        .prize-section h3 { font-size: 1.8rem; color: var(--primary-pink); margin-bottom: 30px; }
+        .prize-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .prize-card {
+            background: var(--dark-card); padding: 30px; border-radius: 15px;
+            min-width: 200px; transition: all 0.3s ease; border: 2px solid var(--primary-purple);
+        }
+        .prize-card.first { border-color: #FFD700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+        .prize-card.second { border-color: #C0C0C0; box-shadow: 0 0 30px rgba(192, 192, 192, 0.4); }
+        .prize-card.third { border-color: #CD7F32; box-shadow: 0 0 30px rgba(205, 127, 50, 0.4); }
+        .prize-card:hover { transform: scale(1.05); }
+        .prize-card i { font-size: 3rem; color: #FFD700; margin-bottom: 15px; }
+        .prize-card h4 { color: var(--primary-blue); margin-bottom: 10px; }
+        .prize-card p { font-size: 1.5rem; font-weight: bold; color: var(--primary-pink); }
+        
+        /* Fee */
+        .fee-section { text-align: center; background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink)); padding: 30px; border-radius: 15px; margin-top: 30px; }
+        .fee-section h3 { font-size: 1.5rem; margin-bottom: 10px; }
+        .fee-amount { font-size: 2.5rem; font-weight: bold; color: #fff; }
+        
+        /* Gallery */
+        .gallery-section { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .gallery-item { aspect-ratio: 1; border-radius: 15px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
+        .gallery-item:hover { transform: scale(1.05); }
+        .gallery-placeholder { width: 100%; height: 100%; background: linear-gradient(45deg, var(--primary-purple), var(--primary-blue)); display: flex; justify-content: center; align-items: center; }
+        .gallery-placeholder i { font-size: 4rem; color: #fff; }
+        
+        /* Contact */
+        .contact-section { padding: 40px 20px; text-align: center; }
+        .contact-info p { font-size: 1.1rem; margin: 15px 0; color: #ddd; }
+        .contact-info a { color: var(--primary-blue); text-decoration: none; }
+        .contact-info i { color: var(--primary-pink); margin-right: 10px; }
+        
+        /* Register Button */
+        .register-section { text-align: center; padding: 40px 20px; }
+        .register-btn {
+            padding: 20px 60px; font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink));
+            color: #fff; border: none; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 0 30px var(--primary-purple);
+        }
+        .register-btn:hover { transform: scale(1.1); box-shadow: 0 0 50px var(--primary-pink); }
+        
+        /* Footer */
+        .footer { text-align: center; padding: 30px 20px; background: var(--dark-card); }
+        .social-icons { margin-bottom: 20px; }
+        .social-icons a { color: #fff; font-size: 1.8rem; margin: 0 15px; transition: all 0.3s ease; }
+        .social-icons a:hover { color: var(--primary-pink); transform: scale(1.2); }
+        
+        /* Music Toggle */
+        .music-toggle {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+            background: var(--primary-purple); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; box-shadow: 0 0 20px var(--primary-purple); z-index: 100;
+        }
+        .music-toggle:hover { background: var(--primary-pink); }
+        
+        /* Registration Page */
+        .registration-container { max-width: 600px; margin: 40px auto; padding: 20px; }
+        .registration-title { text-align: center; font-size: 2.5rem; margin-bottom: 40px; color: var(--primary-blue); }
+        .registration-form { background: var(--dark-card); padding: 40px; border-radius: 15px; border: 2px solid var(--primary-purple); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: var(--primary-purple); font-weight: bold; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: var(--dark-bg); border: 2px solid var(--primary-blue); border-radius: 8px; color: #fff; font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-pink); box-shadow: 0 0 10px var(--primary-pink); }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input { width: auto; }
+        .payment-section { text-align: center; margin: 30px 0; }
+        .payment-section h3 { color: var(--primary-pink); margin-bottom: 20px; }
+        .qr-placeholder { width: 200px; height: 200px; background: #fff; margin: 0 auto 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 10px; }
+        .qr-placeholder i { font-size: 4rem; color: var(--dark-bg); }
+        .qr-placeholder p { color: var(--dark-bg); margin-top: 10px; }
+        .submit-btn { width: 100%; padding: 15px; font-size: 1.2rem; background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink)); color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+        .submit-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px var(--primary-pink); }
+        
+        /* Login */
+        .login-container { max-width: 450px; margin: 60px auto; padding: 20px; text-align: center; }
+        .login-title { font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 10px; }
+        .login-subtitle { color: #ccc; margin-bottom: 40px; }
+        .login-form { background: var(--dark-card); padding: 40px; border-radius: 15px; border: 2px solid var(--primary-purple); }
+        .login-btn { width: 100%; padding: 15px; font-size: 1.2rem; background: linear-gradient(45deg, var(--primary-purple), var(--primary-pink)); color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        
+        /* Dashboard */
+        .dashboard-container, .organizer-dashboard-container { max-width: 900px; margin: 40px auto; padding: 20px; }
+        .dashboard-title { text-align: center; font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 30px; }
+        .registration-info { background: var(--dark-card); padding: 40px; border-radius: 15px; border: 2px solid var(--primary-purple); }
+        .registration-info p { font-size: 1.1rem; margin: 15px 0; color: #ddd; }
+        .registration-info strong { color: var(--primary-pink); }
+        
+        /* Organizer Dashboard */
+        .stats-section { text-align: center; margin-bottom: 40px; }
+        .stat-card { background: var(--dark-card); padding: 40px; border-radius: 15px; border: 2px solid var(--primary-purple); }
+        .stat-number { font-size: 4rem; font-weight: bold; color: var(--primary-blue); margin-top: 10px; }
+        .participants-table { background: var(--dark-card); border-radius: 15px; overflow: hidden; border: 2px solid var(--primary-purple); }
+        .participants-table table { width: 100%; border-collapse: collapse; }
+        .participants-table th, .participants-table td { padding: 15px; text-align: left; border-bottom: 1px solid var(--primary-purple); }
+        .participants-table th { background: var(--primary-purple); color: #fff; }
+        .participants-table tr:hover { background: rgba(157, 0, 255, 0.1); }
+        
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--dark-card); padding: 40px; border-radius: 15px; border: 2px solid var(--primary-purple); max-width: 450px; width: 90%; position: relative; text-align: center; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: var(--primary-pink); }
+        .error-message { color: #ff4444; margin-top: 15px; font-weight: bold; }
+        .success-modal h2 { color: #00ff88; margin-bottom: 20px; }
+        .registration-id { font-size: 1.3rem; color: var(--primary-blue); font-weight: bold; margin: 20px 0; }
+        .close-success-btn { padding: 12px 40px; font-size: 1.1rem; background: var(--primary-purple); color: #fff; border: none; border-radius: 8px; cursor: pointer; margin-top: 20px; }
+        
+        /* Back Button */
+        .back-btn { position: absolute; top: 20px; left: 20px; padding: 12px 25px; background: var(--primary-purple); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; z-index: 100; }
+        .back-btn:hover { background: var(--primary-pink); }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .event-title-popup { font-size: 2.5rem; }
+            .event-name { font-size: 2rem; }
+            .countdown-item { min-width: 70px; padding: 10px; }
+            .countdown-item span { font-size: 1.5rem; }
+            .prize-grid { flex-direction: column; align-items: center; }
+            .detail-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation">
+        <div class="light-streak streak-1"></div>
+        <div class="light-streak streak-2"></div>
+        <div class="light-streak streak-3"></div>
+    </div>
+
+    <div id="landingPopup" class="popup-overlay">
+        <div class="popup-content">
+            <h1 class="event-title-popup">GrooveStorm 2026</h1>
+            <h2 class="event-subtitle-popup">Dance Beyond Limits</h2>
+            <button id="enterEventBtn" class="enter-btn">Enter Event <i class="fas fa-arrow-right"></i></button>
+        </div>
+    </div>
+
+    <div id="mainPage" class="page hidden">
+        <header class="header">
+            <h1 class="event-name">GrooveStorm 2026</h1>
+            <p class="event-tagline">Dance Beyond Limits</p>
+            <div class="organizer-icon" id="organizerLoginIcon"><i class="fas fa-user-circle"></i></div>
+        </header>
+
+        <div class="countdown-section">
+            <h3>Countdown to GrooveStorm</h3>
+            <div id="countdown" class="countdown-timer">
+                <div class="countdown-item"><span id="days">00</span><p>Days</p></div>
+                <div class="countdown-item"><span id="hours">00</span><p>Hours</p></div>
+                <div class="countdown-item"><span id="minutes">00</span><p>Minutes</p></div>
+                <div class="countdown-item"><span id="seconds">00</span><p>Seconds</p></div>
+            </div>
+        </div>
+
+        <section class="event-details">
+            <h2 class="section-title">About the Event</h2>
+            <p class="about-text">An electrifying inter-college dance competition featuring solo, duo, and group performances across hip-hop, classical, freestyle, and fusion styles.</p>
+            
+            <div class="details-grid">
+                <div class="detail-card"><i class="fas fa-calendar-alt"></i><h3>Date & Time</h3><p>15 March 2026<br>9:00 AM onwards</p></div>
+                <div class="detail-card"><i class="fas fa-map-marker-alt"></i><h3>Venue</h3><p>VIIT Main Auditorium</p></div>
+                <div class="detail-card"><i class="fas fa-calendar-day"></i><h3>Age Limit</h3><p>16–25 years</p></div>
+                <div class="detail-card"><i class="fas fa-user-clock"></i><h3>Chief Guest</h3><p>Aarav Verma<br>Renowned Choreographer</p></div>
+            </div>
+
+            <div class="prize-section">
+                <h3>🏆 Prize Money</h3>
+                <div class="prize-grid">
+                    <div class="prize-card first"><i class="fas fa-trophy"></i><h4>1st Prize</h4><p>₹10,000</p></div>
+                    <div class="prize-card second"><i class="fas fa-trophy"></i><h4>2nd Prize</h4><p>₹5,000</p></div>
+                    <div class="prize-card third"><i class="fas fa-trophy"></i><h4>3rd Prize</h4><p>₹2,500</p></div>
+                </div>
+            </div>
+
+            <div class="fee-section"><h3>Registration Fee</h3><p class="fee-amount">₹200 per participant</p></div>
+        </section>
+
+        <section class="gallery-section">
+            <h2 class="section-title">Dance Gallery</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item"><div class="gallery-placeholder"><i class="fas fa-users"></i></div></div>
+                <div class="gallery-item"><div class="gallery-placeholder"><i class="fas fa-music"></i></div></div>
+                <div class="gallery-item"><div class="gallery-placeholder"><i class="fas fa-layer-group"></i></div></div>
+                <div class="gallery-item"><div class="gallery-placeholder"><i class="fas fa-star"></i></div></div>
+            </div>
+        </section>
+
+        <section class="contact-section">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-info">
+                <p><i class="fas fa-envelope"></i> <a href="mailto:natrajclub@viit.ac.in">natrajclub@viit.ac.in</a></p>
+                <p><i class="fas fa-phone"></i> +91 9876543210</p>
+                <p><i class="fas fa-building"></i> Natraj Club, VIIT</p>
+            </div>
+        </section>
+
+        <div class="register-section"><button id="registerBtn" class="register-btn">Register Now <i class="fas fa-sign-in-alt"></i></button></div>
+
+        <footer class="footer">
+            <div class="social-icons">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+            <p>&copy; 2026 Natraj Club, VIIT. All rights reserved.</p>
+        </footer>
+
+        <div class="music-toggle" id="musicToggle"><i class="fas fa-music"></i></div>
+    </div>
+
+    <div id="registrationPage" class="page hidden">
+        <button id="backToMain" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+        <div class="registration-container">
+            <h2 class="registration-title">Register for GrooveStorm 2026</h2>
+            <form id="registrationForm" class="registration-form">
+                <div class="form-group"><label>Full Name *</label><input type="text" id="fullName" required minlength="3"></div>
+                <div class="form-group"><label>College Name *</label><input type="text" id="collegeName" required></div>
+                <div class="form-group"><label>Roll Number *</label><input type="text" id="rollNumber" required></div>
+                <div class="form-group"><label>Year *</label><select id="year" required><option value="">Select Year</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option></select></div>
+                <div class="form-group"><label>Branch *</label><input type="text" id="branch" required></div>
+                <div class="form-group"><label>Phone Number *</label><input type="tel" id="phone" required pattern="[0-9]{10}"></div>
+                <div class="form-group"><label>Email ID *</label><input type="email" id="email" required></div>
+                <div class="payment-section">
+                    <h3>Payment</h3>
+                    <div class="qr-code"><div class="qr-placeholder"><i class="fas fa-qrcode"></i><p>Scan to Pay ₹200</p></div></div>
+                    <div class="form-group"><label>Payment Date *</label><input type="date" id="paymentDate" required></div>
+                    <div class="form-group checkbox-group"><input type="checkbox" id="paymentConfirmed" required><label for="paymentConfirmed">I have completed the payment</label></div>
+                </div>
+                <button type="submit" class="submit-btn">Submit Registration</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="userLoginPage" class="page hidden">
+        <button id="backToMainFromUser" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+        <div class="login-container">
+            <h2 class="login-title">User Login</h2>
+            <p class="login-subtitle">Enter your email and phone to view registration</p>
+            <form id="userLoginForm" class="login-form">
+                <div class="form-group"><label>Email ID *</label><input type="email" id="userEmail" required></div>
+                <div class="form-group"><label>Phone Number *</label><input type="tel" id="userPhone" required pattern="[0-9]{10}"></div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="userDashboard" class="page hidden">
+        <button id="logoutUser" class="back-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <div class="dashboard-container">
+            <h2 class="dashboard-title">Your Registration</h2>
+            <div id="userRegistrationInfo" class="registration-info"></div>
+        </div>
+    </div>
+
+    <div id="organizerLoginModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="closeOrganizerModal">&times;</span>
+            <h2>Organizer Login</h2>
+            <form id="organizerLoginForm" class="organizer-login-form">
+                <div class="form-group"><label>Passcode *</label><input type="password" id="organizerPasscode" required></div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <p id="loginError" class="error-message hidden">Invalid Passcode</p>
+        </div>
+    </div>
+
+    <div id="organizerDashboard" class="page hidden">
+        <button id="logoutOrganizer" class="back-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <div class="organizer-dashboard-container">
+            <h2 class="dashboard-title">Organizer Dashboard</h2>
+            <div class="stats-section"><div class="stat-card"><h3>Total Registrations</h3><p id="totalRegistrations" class="stat-number">0</p></div></div>
+            <div class="participants-section"><h3>Participants List</h3><div id="participantsTable" class="participants-table"></div></div>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal hidden">
+        <div class="modal-content success-modal">
+            <h2>&#127881; Registration Successful!</h2>
+            <p>Thanks for registering for GrooveStorm 2026!</p>
+            <p id="registrationIdDisplay" class="registration-id"></p>
+            <button id="closeSuccessModal" class="close-success-btn">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const eventDate = new Date('2026-03-15T09:00:00');
+
+        document.getElementById('enterEventBtn').addEventListener('click', () => {
+            document.getElementById('landingPopup').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+            startCountdown();
+        });
+
+        function startCountdown() {
+            const timer = setInterval(() => {
+                const now = new Date();
+                const diff = eventDate - now;
+                
+                if (diff <= 0) {
+                    clearInterval(timer);
+                    ['days','hours','minutes','seconds'].forEach(id => document.getElementById(id).textContent = '0');
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
+        document.getElementById('registerBtn').addEventListener('click', () => {
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('registrationPage').classList.remove('hidden');
+        });
+
+        document.getElementById('backToMain').addEventListener('click', () => {
+            document.getElementById('registrationPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+        });
+
+        document.getElementById('backToMainFromUser').addEventListener('click', () => {
+            document.getElementById('userLoginPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+        });
+
+        const organizerIcon = document.getElementById('organizerLoginIcon');
+        const organizerModal = document.getElementById('organizerLoginModal');
+        const closeOrganizerModal = document.getElementById('closeOrganizerModal');
+        const organizerForm = document.getElementById('organizerLoginForm');
+
+        organizerIcon.addEventListener('click', () => { organizerModal.classList.remove('hidden'); });
+        closeOrganizerModal.addEventListener('click', () => { organizerModal.classList.add('hidden'); document.getElementById('loginError').classList.add('hidden'); });
+
+        organizerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const passcode = document.getElementById('organizerPasscode').value;
+            if (passcode === 'VDance2026') {
+                organizerModal.classList.add('hidden');
+                document.getElementById('mainPage').classList.add('hidden');
+                document.getElementById('organizerDashboard').classList.remove('hidden');
+                loadOrganizerData();
+                document.getElementById('organizerPasscode').value = '';
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        });
+
+        function loadOrganizerData() {
+            const registrations = JSON.parse(localStorage.getItem('groovestorm_registrations')) || [];
+            document.getElementById('totalRegistrations').textContent = registrations.length;
+            
+            const tableDiv = document.getElementById('participantsTable');
+            if (registrations.length === 0) {
+                tableDiv.innerHTML = '<p style="text-align:center;padding:20px;color:#ccc;">No registrations yet</p>';
+                return;
+            }
+            
+            let html = '<table><thead><tr><th>Name</th><th>College</th><th>Email</th><th>Phone</th><th>Payment Status</th></tr></thead><tbody>';
+            registrations.forEach(reg => {
+                html += `<tr><td>${reg.fullName}</td><td>${reg.collegeName}</td><td>${reg.email}</td><td>${reg.phone}</td><td>${reg.paymentConfirmed ? '<span style="color:#00ff88;">Paid</span>' : '<span style="color:#ff4444;">Pending</span>'}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        }
+
+        document.getElementById('logoutOrganizer').addEventListener('click', () => {
+            document.getElementById('organizerDashboard').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+        });
+
+        const registrationForm = document.getElementById('registrationForm');
+        registrationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value.trim();
+            const collegeName = document.getElementById('collegeName').value.trim();
+            const rollNumber = document.getElementById('rollNumber').value.trim();
+            const year = document.getElementById('year').value;
+            const branch = document.getElementById('branch').value.trim();
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value.trim();
+            const paymentDate = document.getElementById('paymentDate').value;
+            const paymentConfirmed = document.getElementById('paymentConfirmed').checked;
+            
+            if (fullName.length < 3 || !/^[A-Za-z\s]+$/.test(fullName)) { alert('Please enter a valid name (at least 3 characters, letters only)'); return; }
+            if (!/^[A-Za-z0-9]+$/.test(rollNumber)) { alert('Roll number must be alphanumeric'); return; }
+            if (!/^[0-9]{10}$/.test(phone)) { alert('Please enter a valid 10-digit phone number'); return; }
+            if (!email.includes('@') || !email.includes('.')) { alert('Please enter a valid email address'); return; }
+            
+            const regId = 'GS2026-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const registration = { regId, fullName, collegeName, rollNumber, year, branch, phone, email, paymentDate, paymentConfirmed, timestamp: new Date().toISOString() };
+            
+            const registrations = JSON.parse(localStorage.getItem('groovestorm_registrations')) || [];
+            registrations.push(registration);
+            localStorage.setItem('groovestorm_registrations', JSON.stringify(registrations));
+            
+            document.getElementById('registrationIdDisplay').textContent = `Your Registration ID: ${regId}`;
+            document.getElementById('successModal').classList.remove('hidden');
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            registrationForm.reset();
+        });
+
+        document.getElementById('closeSuccessModal').addEventListener('click', () => {
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('registrationPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+        });
+
+        const userLoginForm = document.getElementById('userLoginForm');
+        userLoginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userEmail = document.getElementById('userEmail').value.trim();
+            const userPhone = document.getElementById('userPhone').value;
+            const registrations = JSON.parse(localStorage.getItem('groovestorm_registrations')) || [];
+            const userReg = registrations.find(reg => reg.email === userEmail && reg.phone === userPhone);
+            
+            if (!userReg) { alert('Registration not found. Please check your email and phone number.'); return; }
+            
+            document.getElementById('userLoginPage').classList.add('hidden');
+            document.getElementById('userDashboard').classList.remove('hidden');
+            
+            const infoDiv = document.getElementById('userRegistrationInfo');
+            infoDiv.innerHTML = `
+                <p><strong>Registration ID:</strong> ${userReg.regId}</p>
+                <p><strong>Name:</strong> ${userReg.fullName}</p>
+                <p><strong>College:</strong> ${userReg.collegeName}</p>
+                <p><strong>Roll Number:</strong> ${userReg.rollNumber}</p>
+                <p><strong>Year:</strong> ${userReg.year}th Year</p>
+                <p><strong>Branch:</strong> ${userReg.branch}</p>
+                <p><strong>Phone:</strong> ${userReg.phone}</p>
+                <p><strong>Email:</strong> ${userReg.email}</p>
+                <p><strong>Payment Date:</strong> ${userReg.paymentDate}</p>
+                <p><strong>Payment Status:</strong> ${userReg.paymentConfirmed ? '<span style="color:#00ff88;">✓ Paid</span>' : '<span style="color:#ff4444;">✗ Pending</span>'}</p>
+            `;
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userPhone').value = '';
+        });
+
+        document.getElementById('logoutUser').addEventListener('click', () => {
+            document.getElementById('userDashboard').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+        });
+
+        const musicToggle = document.getElementById('musicToggle');
+        let musicPlaying = false;
+        musicToggle.addEventListener('click', () => {
+            musicPlaying = !musicPlaying;
+            musicToggle.style.background = musicPlaying ? 'var(--primary-pink)' : 'var(--primary-purple)';
+            musicToggle.innerHTML = musicPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-music"></i>';
+            if (musicPlaying) alert('Music playing (prototype - add audio file for real playback)');
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        const paymentDateInput = document.getElementById('paymentDate');
+        const today = new Date().toISOString().split('T')[0];
+        paymentDateInput.setAttribute('min', today);
+    </script>
+</body>
+</html>
